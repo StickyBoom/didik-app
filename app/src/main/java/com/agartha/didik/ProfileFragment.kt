@@ -81,18 +81,19 @@ class ProfileFragment : Fragment() {
         binding.btnLogout.setOnClickListener {
             // A. Hapus data di SharedPreferences
             val editor = sharedPref.edit()
-            editor.clear() // Ini bakal hapus semua data termasuk 'user_name'
+            editor.remove("user_name") // Hapus session login saja
             editor.apply()
 
-            // B. Pindah ke LoginActivity (atau LoginFragment)
-            // Kalau kamu pakai Activity buat Login:
-            try {
-                val intent = android.content.Intent(requireContext(), Class.forName("com.agartha.didik.LoginActivity"))
-                intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-            } catch (e: Exception) {
-                 Toast.makeText(requireContext(), "Error: LoginActivity not found", Toast.LENGTH_SHORT).show()
-            }
+            // B. Pindah ke LoginFragment (Sesuai arsitektur Fragment saat ini)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, LoginFragment())
+                // Hapus semua stack back agar tidak bisa balik ke Profile lagi dengan tombol back
+                .apply {
+                    for (i in 0 until parentFragmentManager.backStackEntryCount) {
+                        parentFragmentManager.popBackStack()
+                    }
+                }
+                .commit()
 
             // C. Kasih notifikasi dikit biar sopan
             Toast.makeText(requireContext(), "Berhasil keluar. Sampai jumpa!", Toast.LENGTH_SHORT).show()

@@ -36,8 +36,8 @@ class DashboardFragment : Fragment() {
 
         // 1. Setup UI Dasar (Greeting dari SharedPreferences)
         val sharedPref = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
-        val username = sharedPref.getString("user_name", "Nadilah")
-        binding.tvGreeting.text = "Halo, $username! 👋"
+        val namaUser = sharedPref.getString("user_name", "User")
+        binding.tvGreeting.text = "Halo, $namaUser! 👋"
 
         // 2. Setup RecyclerView (Layout Manager-nya dulu)
         binding.rvReview.layoutManager = LinearLayoutManager(context)

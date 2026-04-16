@@ -33,14 +33,15 @@ class FormReviewFragment : Fragment() {
 
         // 2. Logika Tombol Simpan (Send Review)
         binding.btnSave.setOnClickListener {
-            val company = binding.etCompanyName.text.toString()
-            val position = binding.etPosition.text.toString()
-            val jobDesc = binding.etJobDesc.text.toString()
-            val reviewText = binding.etReviewText.text.toString()
+            val company = binding.etCompanyName.text.toString().trim()
+            val position = binding.etPosition.text.toString().trim()
+            val jobDesc = binding.etJobDesc.text.toString().trim()
+            val reviewText = binding.etReviewText.text.toString().trim()
             val rating = binding.rbReview.rating
 
-            // Validasi: Pastikan field penting nggak kosong
-            if (company.isNotEmpty() && position.isNotEmpty() && reviewText.isNotEmpty()) {
+            // Validasi: Pastikan semua field terisi dan rating lebih dari 0
+            if (company.isNotEmpty() && position.isNotEmpty() && jobDesc.isNotEmpty() && 
+                reviewText.isNotEmpty() && rating > 0f) {
 
                 // Ambil nama user yang lagi login dari SharedPreferences
                 val sharedPref = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
@@ -67,7 +68,14 @@ class FormReviewFragment : Fragment() {
                 parentFragmentManager.popBackStack()
 
             } else {
-                Toast.makeText(requireContext(), "Semua kolom (kecuali rating) harus diisi ya!", Toast.LENGTH_SHORT).show()
+                // Beri pesan spesifik jika ada yang belum terisi
+                val message = when {
+                    company.isEmpty() || position.isEmpty() || jobDesc.isEmpty() || reviewText.isEmpty() -> 
+                        "Semua kolom teks harus diisi!"
+                    rating <= 0f -> "Jangan lupa berikan rating bintangnya ya!"
+                    else -> "Mohon lengkapi semua data review!"
+                }
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }
         }
     }
