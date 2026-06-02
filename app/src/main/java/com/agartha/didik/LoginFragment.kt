@@ -53,6 +53,7 @@ class LoginFragment : Fragment() {
                 sharedPref.edit().putString("user_name", realName).apply()
 
                 // Pindah ke halaman DashboardFragment
+                (activity as? MainActivity)?.showBottomNav(true)
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, DashboardFragment())
                     .commit()

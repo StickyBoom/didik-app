@@ -90,11 +90,19 @@ class DashboardFragment : Fragment() {
 
         // 6. Navigasi ke halaman Profil User
         binding.ivProfile.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ProfileFragment())
-                .addToBackStack(null)
-                .commit()
+            val mainActivity = activity as? MainActivity
+            mainActivity?.findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottom_navigation)?.selectedItemId = R.id.nav_profile
         }
+
+        // 7. Navigasi ke halaman Search
+        binding.etSearch.setOnClickListener {
+            val mainActivity = activity as? MainActivity
+            mainActivity?.findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottom_navigation)?.selectedItemId = R.id.nav_search
+        }
+        
+        // Prevent keyboard from showing up when clicking etSearch since we navigate to SearchFragment
+        binding.etSearch.isFocusable = false
+        binding.etSearch.isClickable = true
     }
 
     override fun onDestroyView() {
