@@ -8,7 +8,8 @@ import com.agartha.didik.data.repository.UserRepository
 import com.agartha.didik.ui.auth.AuthViewModel
 
 class ViewModelFactory private constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val reviewRepository: com.agartha.didik.data.repository.ReviewRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
@@ -17,8 +18,9 @@ class ViewModelFactory private constructor(
             modelClass.isAssignableFrom(AuthViewModel::class.java) -> {
                 AuthViewModel(userRepository) as T
             }
-            // Besok kalau ada ReviewViewModel atau CompanyViewModel, tinggal kamu tambah di bawah sini:
-            // modelClass.isAssignableFrom(ReviewViewModel::class.java) -> { ... }
+            modelClass.isAssignableFrom(com.agartha.didik.ui.review.ReviewViewModel::class.java) -> {
+                com.agartha.didik.ui.review.ReviewViewModel(reviewRepository) as T
+            }
             else -> throw IllegalArgumentException("ViewModel Tidak Dikenal: " + modelClass.name)
         }
     }
@@ -27,12 +29,11 @@ class ViewModelFactory private constructor(
         @Volatile
         private var instance: ViewModelFactory? = null
 
-        // Fungsi Singleton biar pemanggilan Factory seragam di seluruh aplikasi Didik
         fun getInstance(context: Context): ViewModelFactory {
             return instance ?: synchronized(this) {
-                // Sediakan UserRepository-mu di sini (pastikan Injection/provideRepository sudah kamu buat ya, Nad)
-                val repository = Injection.provideRepository(context)
-                instance ?: ViewModelFactory(repository)
+                val userRepository = Injection.provideRepository(context)
+                val reviewRepository = Injection.provideReviewRepository(context)
+                instance ?: ViewModelFactory(userRepository, reviewRepository)
             }.also { instance = it }
         }
     }

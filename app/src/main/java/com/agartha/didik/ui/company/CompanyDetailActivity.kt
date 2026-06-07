@@ -8,13 +8,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.agartha.didik.adapter.ReviewAdapter
 import com.agartha.didik.databinding.ActivityCompanyDetailBinding // 🌟 SINKRON 100% SAMA PETA LAYOUT KAMU
+import com.agartha.didik.ui.ViewModelFactory
 import com.agartha.didik.ui.review.ReviewModel // 🌟 Ambil model yang kita buat menumpang di ViewModel tadi
 import com.agartha.didik.ui.review.ReviewViewModel
 
 class CompanyDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCompanyDetailBinding
-    private val viewModel: ReviewViewModel by viewModels()
+    private val viewModel: ReviewViewModel by viewModels {
+        ViewModelFactory.getInstance(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

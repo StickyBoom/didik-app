@@ -5,11 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.agartha.didik.R
 import com.agartha.didik.databinding.FragmentHomeBinding
-import com.agartha.didik.ui.adapter.ReviewAdapter
+import com.agartha.didik.adapter.ReviewAdapter
+import com.agartha.didik.ui.ViewModelFactory
 import com.agartha.didik.ui.company.CompanyDetailFragment
+import com.agartha.didik.ui.review.ReviewModel
+import com.agartha.didik.ui.review.ReviewViewModel
 import com.agartha.didik.utils.PreferenceManager
 
 class HomeFragment : Fragment() {
@@ -17,6 +21,10 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private lateinit var preferenceManager: PreferenceManager
+    
+    private val viewModel: ReviewViewModel by viewModels {
+        ViewModelFactory.getInstance(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,8 +39,11 @@ class HomeFragment : Fragment() {
 
         preferenceManager = PreferenceManager(requireContext())
         setupGreeting()
-        setupRecommendations()
-        setupCompanies()
+        
+        viewModel.reviews.observe(viewLifecycleOwner) { reviews ->
+            setupRecommendations(reviews.take(3))
+            setupCompanies(reviews)
+        }
     }
 
     private fun setupGreeting() {
@@ -42,27 +53,28 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setupRecommendations() {
+    private fun setupRecommendations(recommendations: List<ReviewModel>) {
         binding.rvRecommendations.layoutManager = 
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         
-        // Using a dummy list for now to match UI
-        binding.rvRecommendations.adapter = ReviewAdapter(listOf(1, 2, 3)) {
-            navigateToDetail("Figma")
+        binding.rvRecommendations.adapter = ReviewAdapter(recommendations) { review ->
+            navigateToDetail(review)
         }
     }
 
-    private fun setupCompanies() {
+    private fun setupCompanies(companies: List<ReviewModel>) {
         binding.rvCompanies.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvCompanies.adapter = ReviewAdapter(listOf(1, 2, 3, 4)) {
-            navigateToDetail("Tokopedia")
+        binding.rvCompanies.adapter = ReviewAdapter(companies) { review ->
+            navigateToDetail(review)
         }
     }
 
-    private fun navigateToDetail(companyName: String) {
+    private fun navigateToDetail(review: ReviewModel) {
         val fragment = CompanyDetailFragment().apply {
             arguments = Bundle().apply {
-                putString("company", companyName)
+                putString("company", review.companyName)
+                putString("position", review.position)
+                putString("category", review.category)
             }
         }
         parentFragmentManager.beginTransaction()

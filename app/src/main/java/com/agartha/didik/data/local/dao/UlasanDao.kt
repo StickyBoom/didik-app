@@ -1,8 +1,10 @@
 package com.agartha.didik.data.local.dao
 
 import androidx.room.*
+import com.agartha.didik.data.local.entity.KategoriEntity
 import com.agartha.didik.data.local.entity.PerusahaanEntity
 import com.agartha.didik.data.local.entity.UlasanEntity
+import com.agartha.didik.data.local.entity.UserEntity
 
 @Dao
 interface UlasanDao {
@@ -39,4 +41,35 @@ interface UlasanDao {
     // Ambil daftar riwayat ulasan milik satu mahasiswa tertentu
     @Query("SELECT * FROM ulasan WHERE user_id = :userId")
     suspend fun getUlasanByUserId(userId: Int): List<UlasanEntity>
+
+    // Helper untuk mengambil data relasi lengkap tanpa mengubah schema
+    @Query("""
+        SELECT 
+            u.*, 
+            p.nama_perusahaan, 
+            k.nama_kategori as kategori_nama, 
+            us.nama_lengkap as user_nama 
+        FROM ulasan u
+        JOIN perusahaan p ON u.perusahaan_id = p.id
+        JOIN users us ON u.user_id = us.id
+        JOIN kategori_perusahaan k ON p.kategori_id = k.id
+    """)
+    suspend fun getUlasanLengkap(): List<UlasanLengkap>
+
+    // Helper untuk insert data awal (Dummy)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertKategori(kategori: List<KategoriEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPerusahaan(perusahaan: List<PerusahaanEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUsers(users: List<UserEntity>)
 }
+
+data class UlasanLengkap(
+    @Embedded val ulasan: UlasanEntity,
+    @ColumnInfo(name = "nama_perusahaan") val namaPerusahaan: String,
+    @ColumnInfo(name = "kategori_nama") val namaKategori: String,
+    @ColumnInfo(name = "user_nama") val namaUser: String
+)

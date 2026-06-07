@@ -3,6 +3,9 @@ package com.agartha.didik.ui.review
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.agartha.didik.data.repository.ReviewRepository
+import kotlinx.coroutines.launch
 
 // 🌟 STRUKTUR DATA MODEL YANG DICARI ADAPTER & ACTIVITY TEMENMU
 data class ReviewModel(
@@ -15,36 +18,26 @@ data class ReviewModel(
     val reviewerName: String
 )
 
-class ReviewViewModel : ViewModel() {
+class ReviewViewModel(private val reviewRepository: ReviewRepository) : ViewModel() {
 
     private val _reviews = MutableLiveData<List<ReviewModel>>()
     val reviews: LiveData<List<ReviewModel>> get() = _reviews
 
     init {
-        loadDummyReviews()
+        loadReviewsFromDatabase()
     }
 
+    private fun loadReviewsFromDatabase() {
+        viewModelScope.launch {
+            // Kita akan ambil data asli dari Database via Repository
+            // dan memetakan (mapping) ke ReviewModel
+            val reviewModels = reviewRepository.getAllReviewsWithDetails()
+            _reviews.value = reviewModels
+        }
+    }
+
+    // Fungsi lama buat backup jika database kosong (Optional)
     private fun loadDummyReviews() {
-        val dummyList = listOf(
-            ReviewModel(
-                companyName = "Google Indonesia",
-                position = "UI/UX Designer Intern",
-                category = "Design",
-                jobDesc = "Membuat wireframe dan UI design system Skilink.",
-                reviewText = "Mentornya sangat suportif dan ramah banget!",
-                rating = 4.8f,
-                reviewerName = "Nadilah Nur"
-            ),
-            ReviewModel(
-                companyName = "Tokopedia",
-                position = "Software Engineer Intern",
-                category = "Tech",
-                jobDesc = "Maintenance fitur database dan kelola POS.",
-                reviewText = "Tech stack-nya bener-bener modern dan asyik.",
-                rating = 4.5f,
-                reviewerName = "Farhan Alif"
-            )
-        )
-        _reviews.value = dummyList
+        // ... (tetap ada atau dihapus)
     }
 }

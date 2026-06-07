@@ -35,12 +35,12 @@ class ReviewAdapter(
         val review = listReview[position]
         
         // Mengisi data ke dalam komponen UI
-        holder.binding.tvCompany.text = review.companyName
-        holder.binding.tvPosition.text = review.position
-        holder.binding.ratingBar.rating = review.rating
         holder.binding.tvReviewerName.text = review.reviewerName
+        holder.binding.tvPositionAndCompany.text = "${review.position} @ ${review.companyName}"
+        holder.binding.ratingBar.rating = review.rating
         holder.binding.tvReviewTitle.text = review.jobDesc
         holder.binding.tvReviewContent.text = review.reviewText
+        holder.binding.tvTagCategory.text = review.category
 
         // Menangani aksi klik pada item
         holder.itemView.setOnClickListener {

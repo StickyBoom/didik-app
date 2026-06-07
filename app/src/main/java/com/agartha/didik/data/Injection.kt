@@ -2,6 +2,7 @@ package com.agartha.didik.data
 
 import android.content.Context
 import com.agartha.didik.data.local.DidikDatabase
+import com.agartha.didik.data.repository.ReviewRepository
 import com.agartha.didik.data.repository.UserRepository
 
 object Injection {
@@ -14,5 +15,11 @@ object Injection {
 
         // Suntikkan ke UserRepository
         return UserRepository.getInstance(userDao)
+    }
+
+    fun provideReviewRepository(context: Context): ReviewRepository {
+        val database = DidikDatabase.getDatabase(context)
+        val ulasanDao = database.ulasanDao()
+        return ReviewRepository(ulasanDao)
     }
 }
